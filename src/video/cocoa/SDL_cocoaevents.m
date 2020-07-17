@@ -43,17 +43,7 @@
 
 @end
 
-@implementation SDLApplication
-
-// Override terminate to handle Quit and System Shutdown smoothly.
-- (void)terminate:(id)sender
-{
-    SDL_SendQuit();
-}
-
-static SDL_bool s_bShouldHandleEventsInSDLApplication = SDL_FALSE;
-
-static void Cocoa_DispatchEvent(NSEvent *theEvent)
+void Cocoa_DispatchEvent(NSEvent *theEvent)
 {
     SDL_VideoDevice *_this = SDL_GetVideoDevice();
 
@@ -80,6 +70,17 @@ static void Cocoa_DispatchEvent(NSEvent *theEvent)
             break;
     }
 }
+
+@implementation SDLApplication
+
+// Override terminate to handle Quit and System Shutdown smoothly.
+- (void)terminate:(id)sender
+{
+    SDL_SendQuit();
+}
+
+static SDL_bool s_bShouldHandleEventsInSDLApplication = SDL_FALSE;
+
 
 // Dispatch events here so that we can handle events caught by
 // nextEventMatchingMask in SDL, as well as events caught by other
@@ -280,16 +281,16 @@ LoadMainMenuNibIfAvailable(void)
     NSDictionary *infoDict;
     NSString *mainNibFileName;
     bool success = false;
-    
+
     infoDict = [[NSBundle mainBundle] infoDictionary];
     if (infoDict) {
         mainNibFileName = [infoDict valueForKey:@"NSMainNibFile"];
-        
+
         if (mainNibFileName) {
             success = [[NSBundle mainBundle] loadNibNamed:mainNibFileName owner:[NSApplication sharedApplication] topLevelObjects:nil];
         }
     }
-    
+
     return success;
 }
 
@@ -307,7 +308,7 @@ CreateApplicationMenus(void)
     if (NSApp == nil) {
         return;
     }
-    
+
     mainMenu = [[NSMenu alloc] init];
 
     /* Create the main menu bar */
@@ -372,7 +373,7 @@ CreateApplicationMenus(void)
     [windowMenu addItemWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
 
     [windowMenu addItemWithTitle:@"Zoom" action:@selector(performZoom:) keyEquivalent:@""];
-    
+
     /* Add the fullscreen toggle menu option, if supported */
     if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) {
         /* Cocoa should update the title to Enter or Exit Full Screen automatically.
@@ -417,7 +418,7 @@ Cocoa_RegisterApp(void)
          */
         if ([NSApp mainMenu] == nil) {
             bool nibLoaded;
-            
+
             nibLoaded = LoadMainMenuNibIfAvailable();
             if (!nibLoaded) {
                 CreateApplicationMenus();
@@ -467,6 +468,8 @@ Cocoa_PumpEvents(_THIS)
         if ( event == nil ) {
             break;
         }
+
+//        NSLog(@"NSEvent: %@", event.type);
 
         if (!s_bShouldHandleEventsInSDLApplication) {
             Cocoa_DispatchEvent(event);

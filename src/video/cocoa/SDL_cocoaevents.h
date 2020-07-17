@@ -23,6 +23,7 @@
 #ifndef SDL_cocoaevents_h_
 #define SDL_cocoaevents_h_
 
+extern void Cocoa_DispatchEvent(NSEvent *theEvent);
 extern void Cocoa_RegisterApp(void);
 extern void Cocoa_PumpEvents(_THIS);
 extern void Cocoa_SuspendScreenSaver(_THIS);
